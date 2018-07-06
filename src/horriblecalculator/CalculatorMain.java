@@ -10,6 +10,7 @@ package horriblecalculator;
  * @author Yongcong
  */
 public class CalculatorMain {
+
     public static void main(String[] args) {
         new CalculatorDisplay();
     }

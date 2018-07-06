@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
+import java.util.EmptyStackException;
 import java.util.HashSet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,11 +27,11 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  *
  * @author Yongcong
  */
-public class CalculatorDisplay implements KeyListener{
+public class CalculatorDisplay implements KeyListener {
+
     private int screenWidth = 305;
     private int screenHeight = 400;
     private int fontSize = 16;
-    private String displayText = "";
     private JTextField input = new JTextField("");
     private JTextField solution = new JTextField("");
     private JFrame calcFrame;
@@ -38,43 +39,47 @@ public class CalculatorDisplay implements KeyListener{
     private int buttonWidth = 60;
     private int buttonHeight = 35;
     private int buttonGap = 15;
-    
-    public CalculatorDisplay(){
+    private String defaultInputText = "0";
+    private String defaultSolutionText = "answer";
+
+    public CalculatorDisplay() {
         operations = new HashSet<>();
         setUpOperation(operations);
         calcFrame = new JFrame();
         createFrame(calcFrame);
         calculatorInterface(calcFrame);
     }
-    
-    private int setUpTextField(int column1, int solutionRow){
+
+    private int setUpTextField(int column1, int solutionRow) {
         int textFieldHeight = 40;
         /*------------------------------
             solution and input textfield
         ------------------------------*/
         input.setHorizontalAlignment(JTextField.RIGHT);
-        input.setSize(screenWidth-buttonGap*2,textFieldHeight);
-        input.setLocation(column1, solutionRow+textFieldHeight+buttonGap);
+        input.setSize(screenWidth - buttonGap * 2, textFieldHeight);
+        input.setLocation(column1, solutionRow + textFieldHeight + 10);
         input.setBackground(Color.WHITE);
         input.setEditable(false);
-        input.setText("0");
+        input.setFocusable(false);
+        input.setText(defaultInputText);
         //input
-        solution.setSize(screenWidth-buttonGap*2, textFieldHeight);
+        solution.setSize(screenWidth - buttonGap * 2, textFieldHeight);
         solution.setHorizontalAlignment(JTextField.RIGHT);
         solution.setLocation(column1, solutionRow);
         solution.setEditable(false);
-        solution.setText("Answer");
-        
-        return solutionRow+(textFieldHeight+buttonGap)*2;
+        solution.setFocusable(false);
+        solution.setText(defaultSolutionText);
+
+        return solutionRow + (textFieldHeight + buttonGap) * 2;
     }
-    
-    private void setUpOperation(HashSet<Character> operations){
+
+    private void setUpOperation(HashSet<Character> operations) {
         operations.add('+');
         operations.add('-');
         operations.add('/');
         operations.add('*');
     }
-    
+
     private void createFrame(JFrame frame) {
         String title = "Horrible Calculator";
         frame.setTitle(title);
@@ -87,18 +92,17 @@ public class CalculatorDisplay implements KeyListener{
         frame.setVisible(true);
     }
 
-    
-    private void calculatorInterface(JFrame calcFrame){
+    private void calculatorInterface(JFrame calcFrame) {
         int solutionRow = 10;
         int column1 = 15;
         int column2 = buttonGap + column1 + buttonWidth;
         int column3 = buttonGap + column2 + buttonWidth;
         int column4 = buttonGap + column3 + buttonWidth;
         int row5 = setUpTextField(column1, solutionRow);
-        int row4 = row5+50;
-        int row3 = row4+50;
-        int row2 = row3+50;
-        int row1 = row2+50;
+        int row4 = row5 + 50;
+        int row3 = row4 + 50;
+        int row2 = row3 + 50;
+        int row1 = row2 + 50;
         /*Button Layout
    
           1 2 3 4 
@@ -110,8 +114,8 @@ public class CalculatorDisplay implements KeyListener{
         5|0   . =
         
         **********/
-        
-        /*------------------------------
+
+ /*------------------------------
             create buttons here
         ------------------------------*/
         JButton clear = new JButton("c");
@@ -119,11 +123,11 @@ public class CalculatorDisplay implements KeyListener{
         JButton back = new JButton("delete");
         back.setFocusable(false);
         JButton[] buttonNums = new JButton[10];
-        for(int i=0; i<buttonNums.length; i++){
-            buttonNums[i] = new JButton(i+"");
+        for (int i = 0; i < buttonNums.length; i++) {
+            buttonNums[i] = new JButton(i + "");
             buttonNums[i].setFocusable(false);
         }
-        
+
         JButton plus = new JButton("+");
         plus.setFocusable(false);
         JButton equal = new JButton("=");
@@ -148,19 +152,18 @@ public class CalculatorDisplay implements KeyListener{
         point.setFont(new Font("Serif", Font.BOLD, fontSize));
         division.setFont(new Font("Serif", Font.BOLD, fontSize));
         minus.setFont(new Font("Serif", Font.BOLD, fontSize));
-        
+
         /*------------------------------
             button placement
         ------------------------------*/
-        
         point.setSize(60, 35);
         point.setLocation(column3, row1);
-        
-        for(int i=1; i<buttonNums.length; i++){
+
+        for (int i = 1; i < buttonNums.length; i++) {
             buttonNums[i].setSize(buttonWidth, buttonHeight);
         }
         //0
-        buttonNums[0].setSize(2*buttonWidth+buttonGap, buttonHeight);
+        buttonNums[0].setSize(2 * buttonWidth + buttonGap, buttonHeight);
         buttonNums[0].setLocation(column1, row1);
         //9
         buttonNums[9].setLocation(column3, row4);
@@ -180,7 +183,7 @@ public class CalculatorDisplay implements KeyListener{
         buttonNums[2].setLocation(column2, row2);
         //1
         buttonNums[1].setLocation(column1, row2);
-        
+
         //delete
         //back.setSize(90, 35);
         //back.setLocation(15, row2);
@@ -188,21 +191,21 @@ public class CalculatorDisplay implements KeyListener{
         times.setSize(buttonWidth, buttonHeight);
         times.setLocation(column3, row5);
         //subtraction
-        minus.setSize(buttonWidth-10, buttonHeight);
+        minus.setSize(buttonWidth - 10, buttonHeight);
         minus.setLocation(column4, row5);
         //clear
         clear.setSize(buttonWidth, buttonHeight);
         clear.setLocation(column1, row5);
         //addition
-        plus.setSize(buttonWidth-10, buttonHeight*2+buttonGap);
+        plus.setSize(buttonWidth - 10, buttonHeight * 2 + buttonGap);
         plus.setLocation(column4, row4);
         //division
         division.setSize(buttonWidth, buttonHeight);
         division.setLocation(column2, row5);
         //equal
-        equal.setSize(buttonWidth-10, buttonHeight*2+buttonGap);
+        equal.setSize(buttonWidth - 10, buttonHeight * 2 + buttonGap);
         equal.setLocation(column4, row2);
-        
+
         /*------------------------------
             add components here
         ------------------------------*/
@@ -214,18 +217,18 @@ public class CalculatorDisplay implements KeyListener{
         panel.add(plus);
         panel.add(point);
         panel.add(clear);
-        for(int i=0; i<buttonNums.length; i++){
+        for (int i = 0; i < buttonNums.length; i++) {
             panel.add(buttonNums[i]);
         }
         panel.add(solution);
         panel.add(back);
         panel.add(input);
         panel.add(times);
-        
+
         /*------------------------------
             button actions
         ------------------------------*/
-        for(int i=0; i<buttonNums.length; i++){
+        for (int i = 0; i < buttonNums.length; i++) {
             buttonNums[i].addActionListener(buttonNumListener(i));
         }
         clear.addActionListener(clearInputTextAction());
@@ -240,103 +243,111 @@ public class CalculatorDisplay implements KeyListener{
         calcFrame.add(panel, BorderLayout.CENTER);
         calcFrame.setVisible(true);
     }
-    
-    private ActionListener deleteInputTextAction(){
-        return new ActionListener(){
+
+    private ActionListener deleteInputTextAction() {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String result = deleteOneInputText(input.getText());
                 input.setText(result);
-            }};
+            }
+        };
     }
-    
-    private ActionListener clearInputTextAction(){
-        return new ActionListener(){
+
+    private ActionListener clearInputTextAction() {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                input.setText("0");
-                solution.setText("Answer");
-            }};
+                input.setText(defaultInputText);
+                solution.setText(defaultSolutionText);
+            }
+        };
     }
-    
-    private ActionListener buttonNumListener(int value){
-        return new ActionListener(){
+
+    private ActionListener buttonNumListener(int value) {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setInputText(value);
-            }};
+            }
+        };
     }
-    
-    private ActionListener operatorListener(Character operator){
-        return new ActionListener(){
+
+    private ActionListener operatorListener(Character operator) {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String op = operator+"";
+                String op = operator + "";
                 setInputText(op);
-            }};
+            }
+        };
     }
-    
-    private ActionListener resultListener(){
-        return new ActionListener(){
+
+    private ActionListener resultListener() {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setSolutionText(input.getText());
-                input.setText("0");
-            }};
+                input.setText(defaultInputText);
+            }
+        };
     }
-    
-    private void setInputText(String sample){
+
+    private void setInputText(String sample) {
         String s = sample;
         String inputText = input.getText();
-        
+
         //there is already previous input
-        if(!inputText.equals("0")){
-            char lastChar = inputText.charAt(inputText.length()-1);
-            
+        if (!inputText.equals("0")) {
+            char lastChar = inputText.charAt(inputText.length() - 1);
+
             //override the previous operation if different
-            if(operations.contains(lastChar) && operations.contains(sample.charAt(0))){
-                if(lastChar == sample.charAt(0))
+            if (operations.contains(lastChar) && operations.contains(sample.charAt(0))) {
+                if (lastChar == sample.charAt(0)) {
                     s = inputText;
-                else{
-                    s= inputText.substring(0, inputText.length()-1) + sample;
+                } else {
+                    s = inputText.substring(0, inputText.length() - 1) + sample;
                 }
-            }
-            else if(operations.contains(lastChar) && !operations.contains(sample.charAt(0))){
+            } else if (operations.contains(lastChar) && !operations.contains(sample.charAt(0))) {
                 s = inputText + " " + sample;
+            } else if (operations.contains(sample.charAt(0))) {
+                s = inputText + " " + sample;
+            } else {
+                s = inputText + sample;
             }
-            else{
-                if(operations.contains(sample.charAt(0))){
-                    s = inputText + " " + sample;
-                }
-                else{
-                    s = inputText + sample;
-                }
-            }
-        }
-        else{ //no input or the display text is cleared
-            if(operations.contains(sample))
-                s = "0 " + sample;
+        } else //no input or the display text is cleared
+        if (operations.contains(sample.charAt(0))) {
+            s = "0 " + sample;
         }
         input.setText(s);
     }
-    
-    private String deleteOneInputText(String input){
-        String removedLastChar = input.substring(0, input.length()-1);
-        if(removedLastChar.length()==0) return "0";
+
+    private String deleteOneInputText(String input) {
+        String removedLastChar = input.substring(0, input.length() - 1);
+        if (removedLastChar.length() == 0) {
+            return "0";
+        } else if (removedLastChar.length() > 1 && input.charAt(input.length() - 2) == ' ') {
+            removedLastChar = input.substring(0, input.length() - 2);
+        }
         return removedLastChar;
     }
-    
-    public void setInputText(int sample){
-        setInputText(sample+"");
+
+    public void setInputText(int sample) {
+        setInputText(sample + "");
     }
-    
-    public void setSolutionText(String inputText){
+
+    public void setSolutionText(String inputText) {
         Calculate expression = new Calculate(inputText);
-        Double result = expression.calculateExpression();
-        DecimalFormat formatter = new DecimalFormat("#,###.####");
-        solution.setText(formatter.format(result)+"");
+        try {
+            Double result = expression.calculateExpression();
+            DecimalFormat formatter = new DecimalFormat("#,###.####");
+            solution.setText(formatter.format(result) + "");
+            input.setText(defaultInputText);
+        } catch (EmptyStackException e) {
+            solution.setText("enter valid expression");
+        }
     }
-    
+
     /*------------------------------
             keyboard Event
         ------------------------------*/
@@ -346,63 +357,94 @@ public class CalculatorDisplay implements KeyListener{
     public void keyPressed(KeyEvent e) {
         calcFrame.requestFocus();
         int keyCode = e.getKeyCode();
-        if (keyCode == KeyEvent.VK_NUMPAD0 || keyCode == KeyEvent.VK_0) {
-            setInputText(0);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD1 || keyCode == KeyEvent.VK_1) {
-            setInputText(1);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD2 || keyCode == KeyEvent.VK_2) {
-            setInputText(2);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD3 || keyCode == KeyEvent.VK_3) {
-            setInputText(3);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD4 || keyCode == KeyEvent.VK_4) {
-            setInputText(4);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD5 || keyCode == KeyEvent.VK_5) {
-            setInputText(5);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD6 || keyCode == KeyEvent.VK_6) {
-            setInputText(6);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD7 || keyCode == KeyEvent.VK_7) {
-            setInputText(7);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD8 || keyCode == KeyEvent.VK_8) {
-            setInputText(8);
-        }
-        if (keyCode == KeyEvent.VK_NUMPAD9 || keyCode == KeyEvent.VK_9) {
-            setInputText(9);
-        }
-        if (keyCode == KeyEvent.VK_MULTIPLY ) {
-            String s = "*";
-            setInputText(s);
-        }
-        if (keyCode == KeyEvent.VK_DIVIDE) {
-            String s = "/";
-            setInputText(s);
-        }
-        if (keyCode == KeyEvent.VK_SUBTRACT) {
-            String s = "-";
-            setInputText(s);
-        }
-        if (keyCode == KeyEvent.VK_ADD) {
-            String s = "+";
-            setInputText(s);
-        }
-        if (keyCode == KeyEvent.VK_ENTER) {
-            setSolutionText(input.getText());
-            input.setText("0");
-        }
-        if (keyCode == KeyEvent.VK_BACK_SPACE) {
-            String result = deleteOneInputText(input.getText());
-            input.setText(result);
-        }
-        if (keyCode == KeyEvent.VK_DECIMAL) {
-            String s = ".";
-            setInputText(s);
+        switch (keyCode) {
+            //numbers
+            case KeyEvent.VK_0:
+                setInputText(0);
+                break;
+            case KeyEvent.VK_NUMPAD0:
+                setInputText(0);
+                break;
+            case KeyEvent.VK_1:
+                setInputText(1);
+                break;
+            case KeyEvent.VK_NUMPAD1:
+                setInputText(1);
+                break;
+            case KeyEvent.VK_2:
+                setInputText(2);
+                break;
+            case KeyEvent.VK_NUMPAD2:
+                setInputText(2);
+                break;
+            case KeyEvent.VK_3:
+                setInputText(3);
+                break;
+            case KeyEvent.VK_NUMPAD3:
+                setInputText(3);
+                break;
+            case KeyEvent.VK_4:
+                setInputText(4);
+                break;
+            case KeyEvent.VK_NUMPAD4:
+                setInputText(4);
+                break;
+            case KeyEvent.VK_5:
+                setInputText(5);
+                break;
+            case KeyEvent.VK_NUMPAD5:
+                setInputText(5);
+                break;
+            case KeyEvent.VK_6:
+                setInputText(6);
+                break;
+            case KeyEvent.VK_NUMPAD6:
+                setInputText(6);
+                break;
+            case KeyEvent.VK_7:
+                setInputText(7);
+                break;
+            case KeyEvent.VK_NUMPAD7:
+                setInputText(7);
+                break;
+            case KeyEvent.VK_8:
+                setInputText(8);
+                break;
+            case KeyEvent.VK_NUMPAD8:
+                setInputText(8);
+                break;
+            case KeyEvent.VK_9:
+                setInputText(9);
+                break;
+            case KeyEvent.VK_NUMPAD9:
+                setInputText(9);
+                break;
+
+            //operations
+            case KeyEvent.VK_MULTIPLY:
+                setInputText("*");
+                break;
+            case KeyEvent.VK_DIVIDE:
+                setInputText("/");
+                break;
+            case KeyEvent.VK_SUBTRACT:
+                setInputText("-");
+                break;
+            case KeyEvent.VK_ADD:
+                setInputText("+");
+                break;
+            case KeyEvent.VK_DECIMAL:
+                setInputText(".");
+                break;
+            case KeyEvent.VK_ENTER:
+                setSolutionText(input.getText());
+                break;
+            case KeyEvent.VK_BACK_SPACE:
+                String result = deleteOneInputText(input.getText());
+                input.setText(result);
+                break;
+            default:
+                return;
         }
     }
 

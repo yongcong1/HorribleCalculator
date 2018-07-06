@@ -5,20 +5,22 @@
  */
 package horriblecalculator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Stack;
 
 /**
  *
- * @author Yongcong
+ * @author Yongcong Uses the Shunting-yard Algorithm to convert infix expression
+ * to postfix expression then calculate postfix expression by using stack
  */
 public class Calculate {
+
     HashMap<Character, Integer> precedence;
     String expression;
-    public Calculate(String expression){
+
+    public Calculate(String expression) {
         this.expression = expression;
         precedence = new HashMap<>();
         precedence.put('*', 2);
@@ -26,71 +28,65 @@ public class Calculate {
         precedence.put('+', 1);
         precedence.put('-', 1);
     }
-    
-    public double calculateExpression(){
-        Stack<Character> operator = new Stack<>();
-        Queue<Character> outputOperator = new LinkedList<>();
-        Stack<Double> output = new Stack<>();
+
+    public double calculateExpression() {
         String[] expressions = expression.split(" ");
-        prepareStructure(operator, outputOperator, output, expressions);
-        while(!outputOperator.isEmpty()){
-            double second = output.pop();
-            double first = output.pop();
-            double result = operatorOperation(outputOperator.remove(), first, second);
-            output.push(result);
-        }
-        return output.pop();
-    }
-    
-    public double calculateExpression(String expression){
-        Stack<Character> operator = new Stack<>();
-        Queue<Character> outputOperator = new LinkedList<>();
+        ArrayList<Object> postfix = postFix(expressions);
         Stack<Double> output = new Stack<>();
-        String[] expressions = expression.split(" ");
-        prepareStructure(operator, outputOperator, output, expressions);
-        while(!outputOperator.isEmpty()){
-            double second = output.pop();
-            double first = output.pop();
-            double result = operatorOperation(outputOperator.remove(), first, second);
-            output.push(result);
-        }
-        return output.pop();
-    }
-    
-    public double operatorOperation(Character operator, double first, double second){
-        switch(operator){
-            case '*': return first * second;
-            case '/': return first / second;
-            case '+': return first + second;
-            case '-': return first - second;
-            default: return 0;
-        }
-    }
-    
-    public void prepareStructure(Stack<Character> operator, Queue<Character> outputOperator, 
-            Stack<Double> output, String[] expressions){
-        for(int i=0; i<expressions.length; i++){
-            if(isDouble(expressions[i])){
-                output.push(Double.parseDouble(expressions[i]));
+        for (int i = 0; i < postfix.size(); i++) {
+            if (postfix.get(i) instanceof Double) {
+                Double temp = (Double) postfix.get(i);
+                output.push(temp);
+            } else {
+                double second = output.pop();
+                double first = output.pop();
+                char operator = (Character) postfix.get(i);
+                double result = operatorOperation(operator, first, second);
+                output.push(result);
             }
-            else{
-                while(!operator.isEmpty() && precedence.get(operator.peek())>precedence.get(expressions[i].charAt(0))){
-                    outputOperator.add(operator.pop());
+        }
+        return output.pop();
+    }
+
+    public double operatorOperation(Character operator, double first, double second) {
+        switch (operator) {
+            case '*':
+                return first * second;
+            case '/':
+                return first / second;
+            case '+':
+                return first + second;
+            case '-':
+                return first - second;
+            default:
+                return 0;
+        }
+    }
+
+    public ArrayList<Object> postFix(String[] expressions) {
+        Stack<Character> operatorStack = new Stack<>();
+        ArrayList<Object> output = new ArrayList<>();
+        for (int i = 0; i < expressions.length; i++) {
+            if (isDouble(expressions[i])) {
+                output.add(Double.parseDouble(expressions[i]));
+            } else {
+                while (!operatorStack.isEmpty() && precedence.get(operatorStack.peek()) > precedence.get(expressions[i].charAt(0))) {
+                    output.add(operatorStack.pop());
                 }
-                operator.push(expressions[i].charAt(0));
+                operatorStack.push(expressions[i].charAt(0));
             }
         }
-        while(!operator.isEmpty()){
-            outputOperator.add(operator.pop());
+        while (!operatorStack.isEmpty()) {
+            output.add(operatorStack.pop());
         }
+        return output;
     }
-    
-    public boolean isDouble(String str){
-        try{
+
+    public boolean isDouble(String str) {
+        try {
             Double.parseDouble(str);
             return true;
-        }
-        catch(NumberFormatException nfe){
+        } catch (NumberFormatException nfe) {
             return false;
         }
     }
